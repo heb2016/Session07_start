@@ -1,4 +1,10 @@
 import datetime
+
+# add an import at the top
+from passlib.context import CryptContext
+# then, make a context at module scope:
+password_context = CryptContext(schemes=['pbkdf2_sha512'])
+
 from sqlalchemy import (
     Column,
     DateTime,
@@ -59,3 +65,7 @@ class User(Base):
     @classmethod
     def by_name(cls, name):
         return DBSession.query(cls).filter(cls.name == name).first()
+
+        
+    def verify_password(self, password):
+        return password_context.verify(password, self.password)

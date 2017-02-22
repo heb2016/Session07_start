@@ -22,7 +22,9 @@ from ..models import (
 # added these imports from mymodel
 from ..models.mymodel import (
     DBSession,
-    Base
+    Base,
+    User, # <-- new
+    password_context, # <-- new
     )
 
 def usage(argv):
@@ -39,7 +41,16 @@ def main(argv=sys.argv):
     setup_logging(config_uri)
     settings = get_appsettings(config_uri, options=options)
 
-    engine = get_engine(settings)
+    engine = engine_from_config(settings, 'sqlalchemy.')
+    DBSession.configure(bind=engine)
     Base.metadata.create_all(engine)
 
-    session_factory = get_session_factory(engine)
+    #engine = get_engine(settings)
+    #Base.metadata.create_all(engine)
+
+    #session_factory = get_session_factory(engine)
+    with transaction.manager:
+       password = os.environ.get('ADMIN_PASSWORD', 'admin')
+       encrypted = password_context.encrypt(password)
+       admin = User(name=u'admin', password=encrypted)
+       DBSession.add(admin)

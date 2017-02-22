@@ -1,5 +1,16 @@
 from wtforms import Form, TextField, TextAreaField, validators, HiddenField #<-- added HiddenField
 
+# add an import:
+from wtforms import PasswordField
+# and a new form class
+class LoginForm(Form):
+    username = TextField(
+        'Username', [validators.Length(min=1, max=255)]
+    )
+    password = PasswordField(
+        'Password', [validators.Length(min=1, max=255)]
+    )
+    
 strip_filter = lambda x: x.strip() if x else None
 
 class EntryCreateForm(Form):
